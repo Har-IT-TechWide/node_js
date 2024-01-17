@@ -1,41 +1,32 @@
 FROM docker.repo1.chc.com/node:21-alpine
 
-# Create and set ownership of the /app directory
-RUN mkdir /app && chown -R 1001:1001 /app
-USER 1001
+# Create application directory and logs directory with appropriate ownership
+RUN mkdir /app && chown node:node /app
+RUN mkdir /app/logs && chown node:node /app/logs
 
-# Configure npm registry
-RUN echo 'https://repo1.chc.com/artifactory/dl-cdn/v3.18/community' > /etc/apk/repositories \
-    && echo 'https://repo1.chc.com/artifactory/dl-cdn/v3.18/main' >> /etc/apk/repositories
+# Add custom repositories (if still needed)
+RUN echo 'https://repo1.chc.com/artifactory/dl-cdn/v3.18/community' > /etc/apk/repositories
+RUN echo 'https://repo1.chc.com/artifactory/dl-cdn/v3.18/main' >> /etc/apk/repositories
+RUN apk upgrade-update-cache-available
 
-# Update packages and install sudo
-RUN apk update && apk add --no-cache sudo
-
+# Set working directory
 WORKDIR /app
 
-# Set npm registry
+# Configure NPM registry
 RUN npm config set registry https://repo1.chc.com/artifactory/api/npm/npm-virtual/
 
+# Expose port
 EXPOSE 3001
 
-# Copy package files
-COPY --chown=1001:1001 package.json yarn.lock package-lock.json* /app/
+# Copy package files and install dependencies
+COPY --chown=node:node package*.json .yarnrc.yml /app/
+RUN npm install -forces
 
-# Install dependencies
-RUN npm install --force
-RUN npm cache clean --force
+# Copy remaining application files
+COPY --chown=node:node . /app/
 
-# Set ownership and permissions for global node_modules
-USER root
-RUN chown -R root:1001 /usr/local/lib/node_modules
-RUN chmod -R 775 /usr/local/lib/node_modules
-USER 1001
-
-# Create and set ownership of the 'logs' directory
-RUN mkdir logs && chown -R 1001:1001 logs
-
-# Copy the rest of the application code
-COPY --chown=1001:1001 .. /app/
+# Switch to non-root user
+USER node
 
 # Start the application
 CMD ["yarn", "start"]
