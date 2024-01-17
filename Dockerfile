@@ -9,8 +9,8 @@ RUN mkdir /app/logs && chown -R 1001:1001 /app/logs
 USER 1001
 
 # Configure npm registry
-RUN echo 'https://repo1.chc.com/artifactory/dl-cdn/v3.18/community' > /etc/apk/repositories
-RUN echo 'https://repo1.chc.com/artifactory/dl-cdn/v3.18/main' >> /etc/apk/repositories
+RUN echo 'https://repo1.chc.com/artifactory/dl-cdn/v3.18/community' > /etc/apk/repositories && \
+    echo 'https://repo1.chc.com/artifactory/dl-cdn/v3.18/main' >> /etc/apk/repositories
 
 # Update packages and install sudo
 RUN apk update && apk add --no-cache sudo
