@@ -16,7 +16,7 @@ WORKDIR /app
 RUN npm config set registry https://repo1.chc.com/artifactory/api/npm/npm-virtual/
 
 # Expose port
-EXPOSE 3001
+EXPOSE 3005
 
 # Copy package files and install dependencies
 COPY --chown=node:node package*.json .yarnrc.yml /app/
