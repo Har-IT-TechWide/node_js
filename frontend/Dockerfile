@@ -1,14 +1,14 @@
-FROM docker.repol.uhc.com/node:21-alpine
+FROM docker.repol.chc.com/node:21-alpine
 
 RUN mkdir /app && chown node:node /app
 RUN mkdir /app/logs && chown node:node /app/logs
 
-RUN echo 'https://repol.uhc.com/artifactory/dl-cdn/v3.18/community' > /etc/apk/repositories
-RUN echo 'https://repol.uhc.com/artifactory/dl-cdn/v3.18/main' >> /etc/apk/repositories
+RUN echo 'https://repol.chc.com/artifactory/dl-cdn/v3.18/community' > /etc/apk/repositories
+RUN echo 'https://repol.chc.com/artifactory/dl-cdn/v3.18/main' >> /etc/apk/repositories
 
 WORKDIR /app
 
-RUN npm config set registry https://repol.uhc.com/artifactory/api/npm/npm-virtual/
+RUN npm config set registry https://repol.chc.com/artifactory/api/npm/npm-virtual/
 
 EXPOSE 3000
 
