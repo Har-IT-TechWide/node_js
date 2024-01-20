@@ -1,29 +1,25 @@
-FROM docker.repol.uhc.com/node: 21-alpine
-RUN mkdir /app && chown node:node/app
-RUN mkdir /app/logs && chown node:node/app/logs
+FROM docker.repol.uhc.com/node:21-alpine
 
-# Create application directory and logs directory with appropriate ownership
+RUN mkdir /app && chown node:node /app
+RUN mkdir /app/logs && chown node:node /app/logs
 
 RUN echo 'https://repol.uhc.com/artifactory/dl-cdn/v3.18/community' > /etc/apk/repositories
 RUN echo 'https://repol.uhc.com/artifactory/dl-cdn/v3.18/main' >> /etc/apk/repositories
-#Set working directory
 
 WORKDIR /app
 
-#Configure NPM registry
-
 RUN npm config set registry https://repol.uhc.com/artifactory/api/npm/npm-virtual/
 
+EXPOSE 3000
 
-# Expose port
+COPY -chown=node:node package.json yarn.lock package-lock.json* /app/
 
-EXPOSE 3001
+RUN npm install -force
+RUN npm cache clean --force
 
+COPY -chown=node:node . /app/
+RUN chown -R node:node /app/node_modules/.cache  # Ensure correct ownership of .cache
 
-COPY -chown=node:node package.json yarn. lock package-lock.json* /app/
-
-RUN npm install -forces 
-RUN npm cache clean-force
-COPY -chown-node:node. /app/
+USER node  # Switch to non-root user
 
 CMD ["yarn", "start"]
